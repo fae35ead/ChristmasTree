@@ -41,6 +41,14 @@ const GoldMaterial = () => (
   />
 );
 
+// High intensity gold for the glowing star
+const GlowingGoldMaterial = () => (
+    <meshBasicMaterial 
+      color={[2, 1.5, 0.5]} // Values > 1 to trigger bloom
+      toneMapped={false}
+    />
+);
+
 // Reverted to Deep Emerald Green for that luxurious, vintage feel
 const PineLeafMaterial = () => (
   <meshStandardMaterial 
@@ -147,7 +155,7 @@ const StarShape = (props: any) => {
     }, []);
     return (
         <Extrude args={[shape, { depth: 0.3, bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.05, steps: 1 }]} {...props}>
-             <GoldMaterial />
+             <GlowingGoldMaterial />
         </Extrude>
     )
 }
@@ -213,9 +221,6 @@ const ExplodingPart = ({
              meshRef.current.rotation.y += rotationAxis.current.y * delta * rotationSpeed * progress.current;
              meshRef.current.rotation.z += rotationAxis.current.z * delta * rotationSpeed * progress.current;
         } else {
-             // Reset rotation when not exploded is handled by parent or initial state, 
-             // but here we force 0 to ensure clean reset for the exploding container.
-             // However, we want the internal BobbingOrnament to still work, so we just zero out the explosion rotation
              meshRef.current.rotation.set(0,0,0);
         }
     });
@@ -363,7 +368,6 @@ const BobbingOrnament = ({ type, isExploded }: { type: string, isExploded: boole
     useFrame((state) => {
         if (groupRef.current && !isExploded) {
             const t = state.clock.elapsedTime + phase;
-            // Gentle sway/bob
             groupRef.current.rotation.z = Math.sin(t * 1.5) * 0.1; 
             groupRef.current.rotation.y = Math.sin(t * 0.8) * 0.2;
             groupRef.current.position.y = Math.sin(t * 1) * 0.05;
@@ -438,7 +442,6 @@ const ProceduralTree = ({ isExploded }: { isExploded: boolean }) => {
                         {b.type === 'branch' ? (
                             <PineBranch />
                         ) : (
-                            // Closer to branch, not floating out
                             <group position={[0, 0.2, 0.2]}> 
                                 <BobbingOrnament type={b.type} isExploded={isExploded} />
                             </group>
@@ -538,19 +541,21 @@ const HoloRings = ({ isExploded }: { isExploded: boolean }) => {
         setOpacity(THREE.MathUtils.lerp(opacity, targetOpacity, delta * 3));
     });
 
+    // Material with values > 1 will glow when Bloom is enabled
+    // toneMapped={false} allows colors to exceed 1.0
     return (
         <group ref={ringRef} visible={opacity > 0.01}>
             <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, -3, 0]}>
-                <torusGeometry args={[5, 0.02, 16, 100]} />
-                <meshBasicMaterial color="#ffffff" transparent opacity={opacity} />
+                <torusGeometry args={[5, 0.03, 16, 100]} />
+                <meshBasicMaterial color={[3, 3, 3]} transparent opacity={opacity} toneMapped={false} />
             </mesh>
              <mesh rotation={[Math.PI / 2.1, 0, 0]} position={[0, 0, 0]}>
-                <torusGeometry args={[3.5, 0.02, 16, 100]} />
-                <meshBasicMaterial color="#ffffff" transparent opacity={opacity} />
+                <torusGeometry args={[3.5, 0.03, 16, 100]} />
+                <meshBasicMaterial color={[3, 3, 3]} transparent opacity={opacity} toneMapped={false} />
             </mesh>
              <mesh rotation={[Math.PI / 1.9, 0, 0]} position={[0, 3, 0]}>
-                <torusGeometry args={[2, 0.02, 16, 100]} />
-                <meshBasicMaterial color="#ffffff" transparent opacity={opacity} />
+                <torusGeometry args={[2, 0.03, 16, 100]} />
+                <meshBasicMaterial color={[3, 3, 3]} transparent opacity={opacity} toneMapped={false} />
             </mesh>
         </group>
     )

@@ -1,17 +1,22 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, Suspense } from 'react';
 import { Scene } from './components/Scene';
 import { UIOverlay } from './components/UIOverlay';
-import { playExplosionSound, playMagicSound } from './services/audioService';
+import { Loader } from './components/Loader';
+import { playExplosionSound, playMagicSound, initAudio, toggleMute, getMuteState } from './services/audioService';
 
 const App: React.FC = () => {
   const [isExploded, setIsExploded] = useState(false);
+  const [isMuted, setIsMuted] = useState(getMuteState());
   
   // Refs for tracking drag vs click
   const dragStartPos = useRef<{x: number, y: number} | null>(null);
   const isDragging = useRef(false);
 
   const handlePointerDown = (e: React.PointerEvent) => {
+    // Attempt to initialize audio on first interaction (mobile policy)
+    initAudio();
+    
     dragStartPos.current = { x: e.clientX, y: e.clientY };
     isDragging.current = false;
   };
@@ -47,6 +52,17 @@ const App: React.FC = () => {
     setIsExploded(false);
   };
 
+  const handleToggleAudio = () => {
+    const newState = !isMuted;
+    setIsMuted(newState);
+    toggleMute(newState);
+    
+    // Force init if not already (in case user clicks this button first)
+    if (!newState) {
+      initAudio();
+    }
+  };
+
   return (
     <div 
       className="relative w-full h-screen overflow-hidden bg-emerald-950 text-gold-100 selection:bg-gold-500 selection:text-emerald-950 cursor-pointer"
@@ -54,11 +70,18 @@ const App: React.FC = () => {
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
     >
-      {/* 3D Scene Background */}
-      <Scene isExploded={isExploded} />
+      <Suspense fallback={<Loader />}>
+        {/* 3D Scene Background */}
+        <Scene isExploded={isExploded} />
+      </Suspense>
       
       {/* UI Overlay */}
-      <UIOverlay isExploded={isExploded} onReset={handleReset} />
+      <UIOverlay 
+        isExploded={isExploded} 
+        onReset={handleReset} 
+        onToggleAudio={handleToggleAudio}
+        isMuted={isMuted}
+      />
       
       {/* Texture Overlay for Grain */}
       <div className="pointer-events-none fixed inset-0 opacity-[0.03] z-40 mix-blend-overlay" 

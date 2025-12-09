@@ -1,8 +1,14 @@
 
-// A simple synthesizer using the Web Audio API to create magical sounds
-// avoiding the need for external MP3 assets that might link-rot.
+// A service to handle background music and sound effects
 
 let audioCtx: AudioContext | null = null;
+let bgmAudio: HTMLAudioElement | null = null;
+let isMuted = false;
+let isInitialized = false;
+
+// URL for a gentle instrumental Christmas track (We Wish You a Merry Christmas)
+// Using a reliable public domain/CC0 source
+const BGM_URL = "https://cdn.pixabay.com/audio/2022/11/22/audio_febc508520.mp3"; 
 
 const getContext = () => {
   if (!audioCtx) {
@@ -10,6 +16,58 @@ const getContext = () => {
   }
   return audioCtx;
 };
+
+export const initAudio = () => {
+  if (isInitialized) return;
+  
+  // 1. Initialize Web Audio Context (needed for SFX)
+  const ctx = getContext();
+  if (ctx.state === 'suspended') {
+    ctx.resume();
+  }
+
+  // 2. Initialize Background Music
+  if (!bgmAudio) {
+    bgmAudio = new Audio(BGM_URL);
+    bgmAudio.loop = true;
+    bgmAudio.volume = 0.4; // Gentle background level
+    
+    // Try to play immediately if not muted
+    if (!isMuted) {
+      bgmAudio.play().catch(e => {
+        console.log("Autoplay blocked, waiting for interaction", e);
+      });
+    }
+  }
+
+  isInitialized = true;
+};
+
+export const toggleMute = (muted: boolean) => {
+  isMuted = muted;
+  
+  // Handle BGM
+  if (bgmAudio) {
+    if (isMuted) {
+      bgmAudio.pause();
+    } else {
+      // Resume if initialized
+      bgmAudio.play().catch(console.error);
+    }
+  }
+
+  // Handle SFX Context
+  const ctx = getContext();
+  if (isMuted) {
+    ctx.suspend();
+  } else {
+    ctx.resume();
+  }
+};
+
+export const getMuteState = () => isMuted;
+
+// --- SFX Generators ---
 
 const createGain = (ctx: AudioContext, t: number, duration: number, vol: number) => {
     const gain = ctx.createGain();
@@ -19,13 +77,14 @@ const createGain = (ctx: AudioContext, t: number, duration: number, vol: number)
 };
 
 export const playExplosionSound = () => {
+  if (isMuted) return;
+  
   try {
     const ctx = getContext();
     if(ctx.state === 'suspended') ctx.resume();
     const t = ctx.currentTime;
 
-    // 1. Warm Low Thrum (instead of harsh noise)
-    // Simulates a heavy object moving through air / magical release
+    // 1. Warm Low Thrum
     const osc1 = ctx.createOscillator();
     osc1.type = 'sine';
     const gain1 = createGain(ctx, t, 2.0, 0.8);
@@ -38,7 +97,7 @@ export const playExplosionSound = () => {
     osc1.start(t);
     osc1.stop(t + 2.0);
 
-    // 2. Magical Wind Chimes (Cascading) to replace the shatter sound
+    // 2. Magical Wind Chimes
     const frequencies = [880, 1174, 1318, 1760, 2093];
     frequencies.forEach((freq, i) => {
         const osc = ctx.createOscillator();
@@ -57,6 +116,8 @@ export const playExplosionSound = () => {
 };
 
 export const playMagicSound = () => {
+  if (isMuted) return;
+
   try {
     const ctx = getContext();
     if(ctx.state === 'suspended') ctx.resume();
@@ -84,12 +145,13 @@ export const playMagicSound = () => {
 };
 
 export const playRevealSound = () => {
+    if (isMuted) return;
+
     try {
         const ctx = getContext();
         if(ctx.state === 'suspended') ctx.resume();
         const t = ctx.currentTime;
     
-        // A soft "Ting" or "Whoosh"
         const osc = ctx.createOscillator();
         osc.type = 'sine';
         const gain = createGain(ctx, t, 1.5, 0.3);
