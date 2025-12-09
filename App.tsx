@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, Suspense } from 'react';
+import React, { useState, useRef, Suspense, useEffect } from 'react';
 import { Scene } from './components/Scene';
 import { UIOverlay } from './components/UIOverlay';
 import { Loader } from './components/Loader';
@@ -13,8 +13,14 @@ const App: React.FC = () => {
   const dragStartPos = useRef<{x: number, y: number} | null>(null);
   const isDragging = useRef(false);
 
+  // Attempt autoplay on mount
+  useEffect(() => {
+    initAudio();
+  }, []);
+
   const handlePointerDown = (e: React.PointerEvent) => {
-    // Attempt to initialize audio on first interaction (mobile policy)
+    // Attempt to initialize audio on interaction (mobile policy unlock)
+    // This is safe to call repeatedly as it handles its own state checks
     initAudio();
     
     dragStartPos.current = { x: e.clientX, y: e.clientY };
@@ -57,7 +63,7 @@ const App: React.FC = () => {
     setIsMuted(newState);
     toggleMute(newState);
     
-    // Force init if not already (in case user clicks this button first)
+    // Force init if not already (in case user clicks this button first to UNMUTE)
     if (!newState) {
       initAudio();
     }
