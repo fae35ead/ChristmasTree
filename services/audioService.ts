@@ -6,9 +6,9 @@ let bgmAudio: HTMLAudioElement | null = null;
 let isMuted = false;
 let isInitialized = false;
 
-// URL for a gentle instrumental Christmas track (We Wish You a Merry Christmas)
-// Using a reliable public domain/CC0 source
-const BGM_URL = "https://cdn.pixabay.com/audio/2022/11/22/audio_febc508520.mp3"; 
+// URL for Jingle Bells (Instrumental/Piano)
+// Source: Pixabay (Royalty Free)
+const BGM_URL = "https://cdn.pixabay.com/audio/2022/10/21/audio_3338872f10.mp3"; 
 
 const getContext = () => {
   if (!audioCtx) {
@@ -30,7 +30,7 @@ export const initAudio = () => {
   if (!bgmAudio) {
     bgmAudio = new Audio(BGM_URL);
     bgmAudio.loop = true;
-    bgmAudio.volume = 0.4; // Gentle background level
+    bgmAudio.volume = 0.3; // Lower volume so SFX pop out
     
     // Try to play immediately if not muted
     if (!isMuted) {
