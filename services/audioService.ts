@@ -4,11 +4,9 @@
 let audioCtx: AudioContext | null = null;
 let bgmAudio: HTMLAudioElement | null = null;
 let isMuted = false;
-let isInitialized = false;
 
-// URL for Jingle Bells (Instrumental/Piano)
-// Source: Pixabay (Royalty Free)
-const BGM_URL = "https://cdn.pixabay.com/audio/2022/10/21/audio_3338872f10.mp3"; 
+// Kevin MacLeod - Jingle Bells (Reliable Source from Archive.org)
+const BGM_URL = "https://ia800501.us.archive.org/6/items/kevin-mac-leod-jingle-bells/Kevin_MacLeod_-_Jingle_Bells.mp3"; 
 
 const getContext = () => {
   if (!audioCtx) {
@@ -18,29 +16,31 @@ const getContext = () => {
 };
 
 export const initAudio = () => {
-  if (isInitialized) return;
-  
   // 1. Initialize Web Audio Context (needed for SFX)
   const ctx = getContext();
-  if (ctx.state === 'suspended') {
-    ctx.resume();
+  if (ctx.state === 'suspended' && !isMuted) {
+    ctx.resume().catch(console.error);
   }
 
   // 2. Initialize Background Music
   if (!bgmAudio) {
     bgmAudio = new Audio(BGM_URL);
     bgmAudio.loop = true;
-    bgmAudio.volume = 0.25; // Lower volume so SFX pop out
-    
-    // Try to play immediately if not muted
-    if (!isMuted) {
-      bgmAudio.play().catch(e => {
-        console.log("Autoplay blocked, waiting for interaction", e);
+    bgmAudio.volume = 0.25; // Balanced volume
+  }
+
+  // 3. Robust Play Logic
+  // If not muted and currently paused, try to play.
+  // This function is safe to call repeatedly; it catches errors (like autoplay blocks) silently.
+  if (!isMuted && bgmAudio.paused) {
+    const playPromise = bgmAudio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Autoplay was prevented. This is normal on first load.
+        // We wait for the next user interaction to call initAudio() again.
       });
     }
   }
-
-  isInitialized = true;
 };
 
 export const toggleMute = (muted: boolean) => {
@@ -51,7 +51,7 @@ export const toggleMute = (muted: boolean) => {
     if (isMuted) {
       bgmAudio.pause();
     } else {
-      // Resume if initialized
+      // Resume immediately
       bgmAudio.play().catch(console.error);
     }
   }
