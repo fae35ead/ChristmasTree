@@ -1,6 +1,4 @@
 
-// A service to handle background music and sound effects
-
 let audioCtx: AudioContext | null = null;
 let bgmAudio: HTMLAudioElement | null = null;
 let isMuted = false;
