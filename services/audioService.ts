@@ -30,7 +30,7 @@ export const initAudio = () => {
   if (!bgmAudio) {
     bgmAudio = new Audio(BGM_URL);
     bgmAudio.loop = true;
-    bgmAudio.volume = 0.3; // Lower volume so SFX pop out
+    bgmAudio.volume = 0.25; // Lower volume so SFX pop out
     
     // Try to play immediately if not muted
     if (!isMuted) {
