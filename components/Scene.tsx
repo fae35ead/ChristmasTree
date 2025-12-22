@@ -5,6 +5,7 @@ import { OrbitControls, Environment } from '@react-three/drei';
 import { ChristmasTree } from './ChristmasTree';
 import { Effects } from './Effects';
 
+// Extend the global JSX namespace to include Three.js elements for React Three Fiber components.
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -13,6 +14,21 @@ declare global {
       ambientLight: any;
       spotLight: any;
       pointLight: any;
+      group: any;
+      mesh: any;
+      meshStandardMaterial: any;
+      meshPhysicalMaterial: any;
+      sphereGeometry: any;
+      coneGeometry: any;
+      torusGeometry: any;
+      cylinderGeometry: any;
+      boxGeometry: any;
+      octahedronGeometry: any;
+      dodecahedronGeometry: any;
+      tetrahedronGeometry: any;
+      capsuleGeometry: any;
+      planeGeometry: any;
+      meshBasicMaterial: any;
     }
   }
 }
@@ -31,10 +47,14 @@ export const Scene: React.FC<SceneProps> = ({ isExploded }) => {
         camera={{ position: [0, 2, 35], fov: 35 }}
       >
         <Suspense fallback={null}>
+          {/* Using color defined in global JSX namespace */}
           <color attach="background" args={['#011c16']} />
+          {/* Using fog defined in global JSX namespace */}
           <fog attach="fog" args={['#011c16', 10, isExploded ? 50 : 45]} />
 
+          {/* Using ambientLight defined in global JSX namespace */}
           <ambientLight intensity={0.5} />
+          {/* Using pointLight defined in global JSX namespace */}
           <pointLight position={[10, 10, 10]} intensity={8} color="#fcd34d" />
           <pointLight position={[-10, 5, 10]} intensity={4} color="#34d399" />
           

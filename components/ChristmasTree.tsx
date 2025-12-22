@@ -4,6 +4,7 @@ import { useFrame } from '@react-three/fiber';
 import { Float, Sparkles, Extrude } from '@react-three/drei';
 import * as THREE from 'three';
 
+// Manually define intrinsic elements for Three.js to resolve TypeScript JSX errors.
 declare global {
   namespace JSX {
     interface IntrinsicElements {
@@ -23,6 +24,10 @@ declare global {
       capsuleGeometry: any;
       planeGeometry: any;
       meshBasicMaterial: any;
+      ambientLight: any;
+      spotLight: any;
+      fog: any;
+      color: any;
     }
   }
 }
@@ -30,6 +35,7 @@ declare global {
 // --- High Fidelity Materials ---
 
 const GoldMaterial = () => (
+  // Using meshPhysicalMaterial defined in global JSX namespace
   <meshPhysicalMaterial 
     color="#fbbf24" 
     emissive="#B8860B"
@@ -41,16 +47,16 @@ const GoldMaterial = () => (
   />
 );
 
-// High intensity gold for the glowing star
 const GlowingGoldMaterial = () => (
+    // Using meshBasicMaterial defined in global JSX namespace
     <meshBasicMaterial 
-      color={[2, 1.5, 0.5]} // Values > 1 to trigger bloom
+      color={[2, 1.5, 0.5]} 
       toneMapped={false}
     />
 );
 
-// Reverted to Deep Emerald Green for that luxurious, vintage feel
 const PineLeafMaterial = () => (
+  // Using meshStandardMaterial defined in global JSX namespace
   <meshStandardMaterial 
     color="#047857" 
     emissive="#064e3b" 
@@ -61,6 +67,7 @@ const PineLeafMaterial = () => (
 );
 
 const RedVelvetMaterial = () => (
+    // Using meshStandardMaterial defined in global JSX namespace
     <meshStandardMaterial
         color="#991b1b"
         roughness={0.7}
@@ -69,6 +76,7 @@ const RedVelvetMaterial = () => (
 );
 
 const PaperMaterial = () => (
+    // Using meshStandardMaterial defined in global JSX namespace
     <meshStandardMaterial
         color="#f3f4f6"
         roughness={0.9}
@@ -77,6 +85,7 @@ const PaperMaterial = () => (
 );
 
 const CookieMaterial = () => (
+    // Using meshStandardMaterial defined in global JSX namespace
     <meshStandardMaterial
         color="#d97706"
         roughness={0.9}
@@ -85,6 +94,7 @@ const CookieMaterial = () => (
 );
 
 const GlowingHeartMaterial = () => (
+    // Using meshPhysicalMaterial defined in global JSX namespace
     <meshPhysicalMaterial
         color="#e11d48"
         emissive="#ff0033"
@@ -99,6 +109,7 @@ const GlowingHeartMaterial = () => (
 // --- Geometries ---
 
 const ShapeExtrusion = ({ pathShape, color, scale = 1, ...props }: any) => (
+    // Extrude and meshStandardMaterial defined in JSX namespace
     <Extrude args={[pathShape, { depth: 0.2, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 3, steps: 1 }]} {...props} scale={[scale, scale, scale]} rotation={[Math.PI, 0, 0]}>
        <meshStandardMaterial color={color} roughness={0.3} metalness={0.6} />
     </Extrude>
@@ -225,23 +236,28 @@ const ExplodingPart = ({
         }
     });
 
+    // Using group defined in global JSX namespace
     return <group ref={meshRef}>{children}</group>;
 };
 
 // --- Tree Branch ---
 
-const PineBranch = () => (
-    <group rotation={[Math.PI * 0.15, 0, 0]}>
-        <mesh position={[0, 0, 0]} scale={[1, 1, 1]}>
-            <coneGeometry args={[1.2, 2.5, 32]} />
-            <PineLeafMaterial />
-        </mesh>
-    </group>
-);
+const PineBranch = () => {
+    return (
+        // Using group, mesh, and coneGeometry defined in global JSX namespace
+        <group rotation={[Math.PI * 0.15, 0, 0]}>
+            <mesh position={[0, 0, 0]} scale={[1, 1, 1]}>
+                <coneGeometry args={[1.2, 2.5, 32]} />
+                <PineLeafMaterial />
+            </mesh>
+        </group>
+    );
+};
 
 // --- Ornaments ---
 
 const GiftOrnament = () => (
+    // Using group, mesh, and boxGeometry defined in global JSX namespace
     <group scale={0.4} rotation={[Math.random(), Math.random(), Math.random()]}>
         <mesh castShadow>
             <boxGeometry args={[1, 0.8, 1]} />
@@ -259,6 +275,7 @@ const GiftOrnament = () => (
 );
 
 const GingerbreadMan = () => (
+    // Using group, mesh, sphereGeometry, and capsuleGeometry defined in global JSX namespace
     <group scale={0.35}>
         <mesh position={[0, 0.8, 0]}>
             <sphereGeometry args={[0.4, 16, 16]} />
@@ -288,6 +305,7 @@ const GingerbreadMan = () => (
 );
 
 const PolaroidPhoto = () => (
+    // Using group, mesh, boxGeometry, planeGeometry, and meshBasicMaterial defined in global JSX namespace
     <group scale={0.35} rotation={[0, 0, Math.random() * 0.4 - 0.2]}>
         <mesh>
             <boxGeometry args={[1, 1.2, 0.05]} />
@@ -301,6 +319,7 @@ const PolaroidPhoto = () => (
 );
 
 const Stocking = () => (
+    // Using group, mesh, and capsuleGeometry defined in global JSX namespace
     <group scale={0.35}>
         <mesh position={[0, 0.3, 0]}>
             <capsuleGeometry args={[0.25, 0.6, 4, 16]} />
@@ -314,6 +333,7 @@ const Stocking = () => (
 );
 
 const Doll = () => (
+    // Using group, mesh, sphereGeometry, dodecahedronGeometry, and meshStandardMaterial defined in global JSX namespace
     <group scale={0.3}>
          <mesh position={[0,0.5,0]}>
             <sphereGeometry args={[0.4, 16, 16]} />
@@ -341,6 +361,7 @@ const Ornament = ({ type }: { type: string }) => {
         case 'bulb':
         default:
             return (
+                // Using group, mesh, sphereGeometry, cylinderGeometry, and materials defined in global JSX namespace
                 <group scale={0.25}>
                     <mesh position={[0, -0.5, 0]}>
                         <sphereGeometry args={[0.8, 32, 32]} />
@@ -374,6 +395,7 @@ const BobbingOrnament = ({ type, isExploded }: { type: string, isExploded: boole
         }
     });
 
+    // Using group defined in global JSX namespace
     return (
         <group ref={groupRef}>
             <Ornament type={type} />
@@ -384,7 +406,6 @@ const BobbingOrnament = ({ type, isExploded }: { type: string, isExploded: boole
 // --- Procedural Spiral Tree Generator ---
 
 const ProceduralTree = ({ isExploded }: { isExploded: boolean }) => {
-    // Keeping the branch count somewhat contained but texture high
     const branchCount = 140; 
     const goldenRatio = (1 + Math.sqrt(5)) / 2;
     const angleIncrement = Math.PI * 2 * goldenRatio;
@@ -397,14 +418,12 @@ const ProceduralTree = ({ isExploded }: { isExploded: boolean }) => {
         for (let i = 0; i < branchCount; i++) {
             const t = i / branchCount; 
             const y = height / 2 - (t * height); 
-            // Shape profile
             const radius = maxRadius * Math.pow(t, 0.85); 
             const angle = i * angleIncrement;
             
             const x = Math.cos(angle) * radius;
             const z = Math.sin(angle) * radius;
 
-            // Balanced mix
             const isOrnament = Math.random() > 0.4; 
             let type = 'branch';
             
@@ -421,7 +440,6 @@ const ProceduralTree = ({ isExploded }: { isExploded: boolean }) => {
                 else type = 'bulb';
             }
 
-            // Consistent scaling
             const scale = 1.0 - (t * 0.3); 
 
             temp.push({ position: [x, y, z], rotation: [0, -angle, 0], scale, type, id: i });
@@ -429,6 +447,7 @@ const ProceduralTree = ({ isExploded }: { isExploded: boolean }) => {
         return temp;
     }, []);
 
+    // Using group defined in global JSX namespace
     return (
         <group>
             {branches.map((b) => (
@@ -475,6 +494,7 @@ const CentralHeartGift = ({ show }: { show: boolean }) => {
         }
     });
 
+    // Using group and pointLight defined in global JSX namespace
     return (
         <group ref={ref} scale={scale}>
             <group scale={1.8}>
@@ -498,9 +518,10 @@ const CentralHeartGift = ({ show }: { show: boolean }) => {
 // --- Particles & Atmosphere ---
 
 const Atmosphere = ({ isExploded }: { isExploded: boolean }) => {
+    // Using group defined in global JSX namespace
     return (
         <group visible={!isExploded}>
-            {/* Soft White Snow */}
+            {/* Soft White Snow (Small Flurries) */}
             <Sparkles 
                 count={80} 
                 scale={[12, 18, 12]} 
@@ -519,6 +540,16 @@ const Atmosphere = ({ isExploded }: { isExploded: boolean }) => {
                 color="#FFD700"
                 noise={0.2} 
             />
+            {/* Gentle, falling large snowflakes */}
+            <Sparkles 
+                count={120} 
+                scale={[15, 20, 15]} 
+                size={1.5} 
+                speed={0.04} 
+                opacity={0.35} 
+                color="#eef2ff"
+                noise={0.8} 
+            />
         </group>
     );
 }
@@ -530,19 +561,14 @@ const HoloRings = ({ isExploded }: { isExploded: boolean }) => {
     
     useFrame((state, delta) => {
         if (ringRef.current) {
-            // Rotate the rings group slowly
             ringRef.current.rotation.y -= delta * 0.2;
-            // Wobble slightly
             ringRef.current.rotation.x = Math.sin(state.clock.elapsedTime * 0.5) * 0.05;
         }
-        
-        // Fade out on explosion
         const targetOpacity = isExploded ? 0 : 0.6;
         setOpacity(THREE.MathUtils.lerp(opacity, targetOpacity, delta * 3));
     });
 
-    // Material with values > 1 will glow when Bloom is enabled
-    // toneMapped={false} allows colors to exceed 1.0
+    // Using group, mesh, torusGeometry, and meshBasicMaterial defined in global JSX namespace
     return (
         <group ref={ringRef} visible={opacity > 0.01}>
             <mesh rotation={[Math.PI / 2, 0, 0]} position={[0, -3, 0]}>
@@ -579,16 +605,14 @@ export const ChristmasTree: React.FC<ChristmasTreeProps> = ({ isExploded }) => {
       return () => clearTimeout(t);
   }, [isExploded]);
 
+  // Using group and other Three.js elements defined in global JSX namespace
   return (
     <group>
       <Float speed={isExploded ? 0 : 0.8} rotationIntensity={isExploded ? 0 : 0.1} floatIntensity={isExploded ? 0 : 0.2}>
-        
-        {/* The Main Procedural Tree */}
         <group position={[0, 0, 0]}>
             <ProceduralTree isExploded={isExploded} />
         </group>
 
-        {/* Base / Trunk */}
         <ExplodingPart isExploded={isExploded} distance={7} rotationSpeed={0.5}>
             <mesh position={[0, -5.5, 0]}>
                 <cylinderGeometry args={[0.3, 1.2, 1.5, 32]} />
@@ -596,7 +620,6 @@ export const ChristmasTree: React.FC<ChristmasTreeProps> = ({ isExploded }) => {
             </mesh>
         </ExplodingPart>
 
-        {/* Top Star - Raised position to clear foliage */}
         <ExplodingPart isExploded={isExploded} distance={10} speed={4}>
             <group position={[0, 7.5, 0]} scale={1} rotation={[0,0,0]}>
                  <StarShape />
@@ -605,16 +628,12 @@ export const ChristmasTree: React.FC<ChristmasTreeProps> = ({ isExploded }) => {
         </ExplodingPart>
         
         <HoloRings isExploded={isExploded} />
-
         <Atmosphere isExploded={isExploded} />
-
       </Float>
 
-      {/* The Hidden Gift */}
       <group position={[0, 0.5, 0]}>
           <CentralHeartGift show={showHeart} />
       </group>
-
     </group>
   );
 };
