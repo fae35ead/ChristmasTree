@@ -6,8 +6,8 @@ let bgmAudio: HTMLAudioElement | null = null;
 let isMuted = false;
 let isBgmStarted = false;
 
-// Kevin MacLeod - Jingle Bells (Reliable Source from Archive.org)
-const BGM_URL = "https://ia800501.us.archive.org/6/items/kevin-mac-leod-jingle-bells/Kevin_MacLeod_-_Jingle_Bells.mp3"; 
+// Using the newly uploaded local asset for maximum reliability
+const BGM_URL = "bgm.mp3"; 
 
 const getContext = () => {
   if (!audioCtx) {
@@ -43,6 +43,7 @@ export const unlockAudio = async () => {
         }
       } catch (error) {
         // This is expected if the gesture wasn't recognized yet or still loading
+        console.debug("BGM play interrupted or waiting for user gesture:", error);
       }
     }
   }
