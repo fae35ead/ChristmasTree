@@ -7,7 +7,7 @@ let isMuted = false;
 let isBgmStarted = false;
 
 // Using the newly uploaded local asset for maximum reliability
-const BGM_URL = "/bgm.mp3"; 
+const BGM_URL = "bgm.mp3"; 
 
 const getContext = () => {
   if (!audioCtx) {
@@ -70,15 +70,6 @@ export const initAudio = () => {
     bgmAudio.load();
   }
   getContext();
-
-// ✅ 修改点2：在这里自动添加全局监听
-  // 这样 App.tsx 不需要写任何额外代码，用户一点屏幕 BGM 就会响
-  window.addEventListener('click', handleUserInteraction);
-  window.addEventListener('touchstart', handleUserInteraction, { passive: true });
-  window.addEventListener('keydown', handleUserInteraction);
-  
-  // 尝试立即播放（万一浏览器允许）
-  unlockAudio();
 };
 
 export const toggleMute = (muted: boolean) => {
