@@ -6,29 +6,32 @@ import { ChristmasTree } from './ChristmasTree';
 import { Effects } from './Effects';
 
 // Extend the global JSX namespace to include Three.js elements for React Three Fiber components.
+// Nesting IntrinsicElements inside React.JSX is necessary for modern React TypeScript support.
 declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      color: any;
-      fog: any;
-      ambientLight: any;
-      spotLight: any;
-      pointLight: any;
-      group: any;
-      mesh: any;
-      meshStandardMaterial: any;
-      meshPhysicalMaterial: any;
-      sphereGeometry: any;
-      coneGeometry: any;
-      torusGeometry: any;
-      cylinderGeometry: any;
-      boxGeometry: any;
-      octahedronGeometry: any;
-      dodecahedronGeometry: any;
-      tetrahedronGeometry: any;
-      capsuleGeometry: any;
-      planeGeometry: any;
-      meshBasicMaterial: any;
+  namespace React {
+    namespace JSX {
+      interface IntrinsicElements {
+        color: any;
+        fog: any;
+        ambientLight: any;
+        spotLight: any;
+        pointLight: any;
+        group: any;
+        mesh: any;
+        meshStandardMaterial: any;
+        meshPhysicalMaterial: any;
+        sphereGeometry: any;
+        coneGeometry: any;
+        torusGeometry: any;
+        cylinderGeometry: any;
+        boxGeometry: any;
+        octahedronGeometry: any;
+        dodecahedronGeometry: any;
+        tetrahedronGeometry: any;
+        capsuleGeometry: any;
+        planeGeometry: any;
+        meshBasicMaterial: any;
+      }
     }
   }
 }

@@ -5,29 +5,32 @@ import { Float, Sparkles, Extrude } from '@react-three/drei';
 import * as THREE from 'three';
 
 // Manually define intrinsic elements for Three.js to resolve TypeScript JSX errors.
+// Augmenting React.JSX.IntrinsicElements is the correct approach for modern React versions.
 declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      group: any;
-      mesh: any;
-      meshStandardMaterial: any;
-      meshPhysicalMaterial: any;
-      sphereGeometry: any;
-      coneGeometry: any;
-      torusGeometry: any;
-      cylinderGeometry: any;
-      pointLight: any;
-      boxGeometry: any;
-      octahedronGeometry: any;
-      dodecahedronGeometry: any;
-      tetrahedronGeometry: any;
-      capsuleGeometry: any;
-      planeGeometry: any;
-      meshBasicMaterial: any;
-      ambientLight: any;
-      spotLight: any;
-      fog: any;
-      color: any;
+  namespace React {
+    namespace JSX {
+      interface IntrinsicElements {
+        group: any;
+        mesh: any;
+        meshStandardMaterial: any;
+        meshPhysicalMaterial: any;
+        sphereGeometry: any;
+        coneGeometry: any;
+        torusGeometry: any;
+        cylinderGeometry: any;
+        pointLight: any;
+        boxGeometry: any;
+        octahedronGeometry: any;
+        dodecahedronGeometry: any;
+        tetrahedronGeometry: any;
+        capsuleGeometry: any;
+        planeGeometry: any;
+        meshBasicMaterial: any;
+        ambientLight: any;
+        spotLight: any;
+        fog: any;
+        color: any;
+      }
     }
   }
 }

@@ -2,32 +2,40 @@ import React, { useState, useRef, Suspense, useEffect } from 'react';
 import { Scene } from './components/Scene';
 import { UIOverlay } from './components/UIOverlay';
 import { Loader } from './components/Loader';
-// 注意：删除了 unlockAudio，因为它在 service 内部自动处理了
-import { playExplosionSound, playMagicSound, initAudio, toggleMute, getMuteState } from './services/audioService';
+import { playExplosionSound, playMagicSound, initAudio, toggleMute, getMuteState, unlockAudio } from './services/audioService';
 
 const App: React.FC = () => {
   const [isExploded, setIsExploded] = useState(false);
-  // 这里的初始状态直接获取，不要放在 useState 初始值函数里调用，防止SSR问题（虽然这里是SPA）
   const [isMuted, setIsMuted] = useState(false); 
   
   const dragStartPos = useRef<{x: number, y: number} | null>(null);
   const isDragging = useRef(false);
 
   useEffect(() => {
-    // 同步一下初始静音状态
+    // 1. 初始化状态和音频对象
     setIsMuted(getMuteState());
-
-    // 1. 初始化音频服务
-    // 新版 audioService 会自动添加全局点击监听来处理 BGM
     initAudio();
 
-    // 这里不需要再手动添加 window.addEventListener 了
-    // audioService.ts 内部已经做好了这一切
+    // 2. 核心修复：移动端音频解锁必须依赖全局的用户交互事件
+    const handleGlobalInteraction = () => {
+      unlockAudio();
+      // 一旦解锁成功，移除监听器以节省资源
+      window.removeEventListener('click', handleGlobalInteraction);
+      window.removeEventListener('touchstart', handleGlobalInteraction);
+    };
+
+    window.addEventListener('click', handleGlobalInteraction);
+    window.addEventListener('touchstart', handleGlobalInteraction);
+
+    return () => {
+      window.removeEventListener('click', handleGlobalInteraction);
+      window.removeEventListener('touchstart', handleGlobalInteraction);
+    };
   }, []);
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    // 这里不需要显式调用 unlockAudio，因为 initAudio 里的全局监听器会捕捉到这次点击
-    
+    // 交互时再次尝试解锁，确保万无一失
+    unlockAudio();
     dragStartPos.current = { x: e.clientX, y: e.clientY };
     isDragging.current = false;
   };
@@ -44,7 +52,6 @@ const App: React.FC = () => {
 
   const handlePointerUp = () => {
     if (!isDragging.current && !isExploded) {
-      // 播放爆炸音效
       playExplosionSound();
       setIsExploded(true);
     }
@@ -62,7 +69,6 @@ const App: React.FC = () => {
     const newState = !isMuted;
     setIsMuted(newState);
     toggleMute(newState);
-    // toggleMute 内部也会处理 AudioContext 的 resume，不需要手动 unlock
   };
 
   return (

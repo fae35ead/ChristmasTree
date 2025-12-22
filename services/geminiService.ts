@@ -1,9 +1,4 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
-
-// Initialize the Google GenAI client with the API key from environment variables.
-// Use process.env.API_KEY directly as required by the guidelines.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const generateSignatureWish = async (): Promise<string> => {
   // Check for the presence of the API key before proceeding.
@@ -12,13 +7,15 @@ export const generateSignatureWish = async (): Promise<string> => {
   }
 
   try {
+    // Create instance inside function to ensure environment context is current
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    
     const prompt = `Write a short, luxurious, and warm Christmas wish in Simplified Chinese (max 25 words).
     Target Audience: "Little V" (小V).
-    Tone: Romantic, cinematic, expensive, "Arix Signature" brand voice but warmer and more festive.
+    Tone: Romantic, cinematic, expensive, brand voice but warmer and more festive.
     Focus: Golden lights, eternity, warmth, and the magic of the moment.
     Output JSON only.`;
 
-    // Always use ai.models.generateContent and the recommended model for basic text tasks.
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
@@ -36,7 +33,6 @@ export const generateSignatureWish = async (): Promise<string> => {
       },
     });
 
-    // Extract text from the response using the .text property (not a method).
     const jsonStr = response.text?.trim() || '{}';
     const json = JSON.parse(jsonStr);
     return json.wish || "金色的流光在翡翠般的夜色中为你闪烁。";
